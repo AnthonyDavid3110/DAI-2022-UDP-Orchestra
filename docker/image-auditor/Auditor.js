@@ -2,42 +2,61 @@ const net = require('net');
 const dgram = require('dgram');
 
 const protocol = require('./musician-protocol');
+const tcpprotocol = require('./auditor-protocol');
 
-// Map to store information about active musicians
-let activeMusicians = new Map();
+// Create a TCP server
+const server = net.createServer(function(socket) {
+  console.log('Client connected');
 
-// UDP socket to listen to musicians' broadcasts
-const udpSocket = dgram.createSocket('udp4');
-udpSocket.bind(protocol.PROTOCOL_PORT, function() {
-  udpSocket.addMembership(protocol.PROTOCOL_MULTICAST_ADDRESS);
-});
+  // Create a datagram socket for listening to UDP messages
+  const udp_socket = dgram.createSocket('udp4');
 
-// Listen to incoming UDP messages
-udpSocket.on('message', function(message) {
-  let payload = JSON.parse(message.toString());
-  activeMusicians.set(payload.uuid, {
-    uuid: payload.uuid,
-    instrument: payload.sound,
-    activeSince: new Date()
+  // Array to store information about active musicians
+  let activeMusicians = [];
+
+  udp_socket.on('message', function(message, remote) {
+    // Parse the received message
+    let data = JSON.parse(message);
+
+    // Check if the received message is from a musician
+    if (data.hasOwnProperty('uuid') && data.hasOwnProperty('sound')) {
+      let musician = {
+        uuid: data.uuid,
+        instrument: data.sound,
+        activeSince: new Date()
+      };
+
+      // Add the musician to the array of active musicians
+      activeMusicians.push(musician);
+
+      console.log('Received message from a musician: ', data);
+    }
+  });
+
+  udp_socket.bind(protocol.PROTOCOL_PORT, function() {
+    console.log('UDP socket listening on port ' + protocol.PROTOCOL_PORT);
+    udp_socket.addMembership(protocol.PROTOCOL_MULTICAST_ADDRESS);
+  });
+
+  // Send the list of active musicians to the client when it connects
+  socket.write(JSON.stringify(activeMusicians));
+
+  // Remove inactive musicians from the list every 5 seconds
+  setInterval(function() {
+    for (let i = activeMusicians.length - 1; i >= 0; i--) {
+      if (new Date() - activeMusicians[i].activeSince > 5000) {
+        console.log('Removing inactive musician: ', activeMusicians[i].uuid);
+        activeMusicians.splice(i, 1);
+      }
+    }
+  }, 5000);
+
+  socket.on('end', function() {
+    console.log('Client disconnected');
+    udp_socket.close();
   });
 });
 
-// TCP server to accept connection requests from clients
-const server = net.createServer(function(socket) {
-  // Build the list of active musicians in the desired format
-  let musicians = [];
-  for (let [key, value] of activeMusicians.entries()) {
-    musicians.push({
-      uuid: value.uuid,
-      instrument: value.instrument,
-      activeSince: value.activeSince.toISOString()
-    });
-  }
-
-  // Send the list of active musicians to the client
-  socket.write(JSON.stringify(musicians));
-});
-
-server.listen(2205, function() {
-  console.log('TCP server listening on port 2205...');
+server.listen(tcpprotocol.PROTOCOL_PORT, function() {
+  console.log('TCP server listening on port ' + tcpprotocol.PROTOCOL_PORT);
 });

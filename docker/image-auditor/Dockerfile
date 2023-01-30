@@ -1,12 +1,18 @@
-FROM node:4.3.1
-MAINTAINER Anthony David <anthony.david@heig-vd.ch>
+FROM node:latest
 
-#
-# When we build the image, we copy the executable jar in the image file system. 
-#
-COPY src /opt/app/
+# To check the active musicians with telnet/ncat
+EXPOSE 2205/tcp
 
-WORKDIR /opt/app/
-RUN npm install
+# Used port for the musicians to sen data to the auditor
+EXPOSE 2023/udp
 
-ENTRYPOINT ["node", "/opt/app/auditor.js"]
+# To connect to the HTTP server
+EXPOSE 3000
+
+RUN mkdir /home/node/app
+
+WORKDIR /home/node/app
+
+COPY src/ /home/node/app/
+
+ENTRYPOINT [ "node", "auditor.js" ]

@@ -22,26 +22,25 @@ function generate_musician(instrument) {
     this.sound = sound[instrument];
     this.uuid = uuid.v4();
 
-
-    this.update = function() {
-        // Data to send
-        const music = {
-            uuid: this.uuid,
-            sound: this.sound
-        };
-
-        // Put data in a JSON string
-        const payload = JSON.stringify(music);
-
-         // Put the payload in a datagram and sending
-        const message = new Buffer(payload);
-
-        socket.send(message, 0, message.length, protocol.PROTOCOL_PORT, protocol.PROTOCOL_MULTICAST_ADDRESS, function(err, bytes) {
-        console.log("Sending payload: " + payload + " via port " + socket.address().port);
-         });
+    // Data to send
+    const music = {
+        uuid: this.uuid,
+        sound: this.sound
     };
+
+    // Put data in a JSON string
+    const payload = JSON.stringify(music);
+
+    // Put the payload in a datagram and sending
+    const message = new Buffer(payload);
+
+    socket.send(message, 0, message.length, protocol.PROTOCOL_PORT, protocol.PROTOCOL_MULTICAST_ADDRESS, function(err, bytes) {
+        console.log("Sending payload: " + payload + " via port " + socket.address().port);
+    });
+
     // Set interval every 1000m
     setInterval(this.update.bind(this), 1000);
 }
 
-var musician = new generate_musician(process.argv[2]);
+var musician = n
+ew generate_musician(process.argv[2]);

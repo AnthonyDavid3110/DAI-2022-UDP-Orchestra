@@ -1,0 +1,14 @@
+{
+  "name": "musician",
+  "version": "0.1.0",
+  "description": "implementation for musician",
+  "main": "musician.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anthony David et Stéphane Nascimento Santos",
+  "license": "ISC",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}

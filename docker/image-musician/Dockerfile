@@ -1,5 +1,15 @@
-FROM node:latest
+<<<<<<< HEAD
+FROM node:4.3.1
+MAINTAINER Anthony David <anthony.david@heig-vd.ch>
 
-COPY src /opt/app
+#
+# When we build the image, we copy the executable jar in the image file system. 
+#
+COPY src /opt/app/
 
-CMD ["node", "opt/app/musician.js"]
+WORKDIR /opt/app/
+RUN npm install
+
+ENTRYPOINT ["node", "/opt/app/musician.js"]
+=======
+>>>>>>> parent of 066d2e6 (first commit)

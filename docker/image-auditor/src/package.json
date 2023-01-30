@@ -1,14 +1,14 @@
 {
   "name": "src",
   "version": "0.1.0",
-  "description": "Implementation for musician",
-  "main": "musician.js",
+  "description": "Implémentation for auditors",
+  "main": "auditor.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Anthony David",
+  "author": "Anthony David et Stéphane Nascimento Santos",
   "license": "ISC",
   "dependencies": {
-    "uuid": "^9.0.0"
+    "dgram": "^1.0.1"
   }
 }

@@ -1,3 +1,6 @@
 #!/bin/bash
 
-docker run -p 9091:3000 dai/musician
+docker run -d dai/musician piano
+docker run -d dai/musician flute
+docker run -d dai/musician flute
+docker run -d dai/musician drum
